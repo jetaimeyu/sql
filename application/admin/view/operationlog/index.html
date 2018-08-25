@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
+    <link rel="stylesheet" href="__LayUI__/css/layui.css"  media="all">
+    <link rel="stylesheet" href="__CommonCSS__/bootstrap.min.css">
+</head>
+<style>
+    .layui-table td, .layui-table th{
+        padding: 9px 8px;
+    }
+    .pagination li {display: inline-block;margin-right: -1px;padding: 5px 8px;border: 1px solid #e2e2e2;min-width: 20px;text-align: center;}
+    .pagination li.active {background: #009688;color: #fff;border: 1px solid #009688;}
+    .pagination li a {display: block;text-align: center;}
+    a:not([href]):not([tabindex]) {
+        color: floralwhite;
+    }
+    a:not([href]):not([tabindex]):hover {
+         color: white;
+        text-decoration: none;
+    }
+</style>
+<body>
+<div class="layui-layout layui-layout-admin" style="padding: 0 1%;box-sizing: border-box;width: 100%;max-width:100%;overflow: auto">
+    <button class="layui-btn layui-btn-normal layui-btn-sm" style="float: right;margin: 10px 0" onclick="javascript:window.location.reload() ">刷新</button>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>用户名</th>
+            <th>sql</th>
+            <th>时间</th>
+            <th id="op">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="logsData" id="vo"}
+        <tr>
+            <td>{$i}</td>
+            <td style="max-width:90px;word-break:break-all;">{$vo.name}</td>
+            <td style="max-width: 100px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{$vo.sqltext}</td>
+            <td>{$vo.addtime}</td>
+            <td>
+                <div class="layui-btn-group">
+                    <button class="layui-btn layui-btn-primary layui-btn-sm seesql" lid="{$vo.id}">查看</button>
+                </div>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    {$logsData->render()|raw}
+</div>
+<script  src="__CommonJS__/jquery.js"></script>
+<script  src="__CommonJS__/bootstrap.min.js"></script>
+<script  src="__LayUI__/layui.all.js"></script>
+</body>
+</html>
+<script>
+    $(function(){
+        $(".seesql").click(function(){
+            var id,url;
+                id = $(this).attr('lid');
+                url = "{:url('admin/Operationlog/getSqlString')}";
+            $.get(url,{'id':id},function(res){
+                layer.open({
+                    content: res, //数组第二项即吸附元素选择器或者DOM
+                    scrollbar:false
+                });
+
+            });
+        })
+
+    })
+</script>

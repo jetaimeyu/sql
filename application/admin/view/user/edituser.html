@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="__LayUI__/css/layui.css"  media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<div style="padding: 20px;">
+    <form class="layui-form layui-form-pane" action="post">
+        <input type="hidden"  name ="id" value="{$Request.param.uid}" id="uid">
+        <div class="layui-form-item">
+            <label class="layui-form-label" >用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" value="{$userData['name']}" autocomplete="off" placeholder="请输入用户名" class="layui-input username">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+
+            <div class="layui-input-inline">
+                {if $Request.param.uid}
+                <input  type="password" name="password"  placeholder="不填写代表不修改密码" autocomplete="off" class="layui-input password" value="" >
+                {else/}
+                <input  type="text" name="password"  placeholder="密码" autocomplete="off" class="layui-input password" value="{:randomkeys(8)}" >
+                {/if}
+            </div>
+            <!--<button class="layui-btn layui-btn-normal" type="button" id="getnewpwd">重新获取密码</button>-->
+        </div>
+        <div class="layui-form-item" pane="">
+            <label class="layui-form-label">是否启用</label>
+            <div class="layui-input-block">
+                <input type="radio" name="state" value="1" title="启用" {eq name="userData['state']" value="1"}checked="true"{/eq}>
+                <input type="radio" name="state" value="2" title="禁用" {eq name="userData['state']" value="2"}checked="true"{/eq}>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">添加备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" class="layui-textarea" name="remark">{$userData.remark}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn" type="button" id="adduserBtn">提交</button>
+        </div>
+    </form>
+</div>
+<script  src="__CommonJS__/jquery.js"></script>
+<script  src="__LayUI__/layui.all.js"></script>
+</body>
+</html>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+    });
+    $(function(){
+        //添加用户
+        $("#adduserBtn").click(function(){
+           var userame = $.trim($(".username").val());
+           var uid = $("#uid").val();
+           var password = $.trim($(".password").val());
+            if(!userame){
+                layer.msg('用户名不能为空', {icon: 5});
+                return false;
+            }
+            if(!uid){
+                if(!password){
+                    layer.msg('密码不能为空', {icon: 5});
+                    return false;
+                }
+            }
+           var data,url;
+                data = $("form").serialize();
+                url = "{:url('admin/User/ajaxeditUser')}";
+            $.ajax({
+                type:'post',
+                data:data,
+                url:url,
+                dataType:'json',
+                success:function(res){
+                   if(res.status==1){
+                       if(!uid ||(uid&&password)){
+                           var tiphtml = '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">用户名：'+userame+'<br>密码：'+password+'</div>';
+                       }else{
+                           var tiphtml = '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">修改用户信息成功。</div>';
+                       }
+                        layui.use('layer', function(){
+                            layer.open({
+                                type: 1
+                                ,title: false //不显示标题栏
+                                ,closeBtn: false
+                                ,area: '300px;'
+                                ,shade: 0.8
+                                ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                                ,resize: false
+                                ,btn: ['返回列表页', '继续添加']
+                                ,btnAlign: 'c'
+                                ,moveType: 1 //拖拽模式，0或者1
+                                ,content: tiphtml
+                                ,success: function(layero){
+                                    var btn = layero.find('.layui-layer-btn');
+                                    btn.find('.layui-layer-btn0').attr({
+                                        href: "{:url('admin/User/index')}"
+                                    });
+                                    btn.find('.layui-layer-btn1').attr({
+                                        href: "{:url('admin/User/edituser')}"
+                                    });
+                                }
+                            });
+                        });
+                   }else{
+                       layui.use('layer', function(){
+                           layer.msg(res.msg, {icon: 5});
+                       });
+                   }
+                },
+                fail:function(){
+                    layui.use('layer', function(){
+                        layer.msg("网络错误请重试", {icon: 5});
+                    });
+                }
+            })
+
+        });
+//        //重新获取密码
+//        $("#getnewpwd").click(function(){
+//            $.get("{:url('admin/User/getNewPwd')}",function(data){
+//                $(".password").val(data);
+//            })
+//
+//        })
+    })
+</script>
