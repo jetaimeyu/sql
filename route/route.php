@@ -8,10 +8,10 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-//Route::rule('index', 'index/Index/index');
-//Route::rule('indexlogin', 'index/Login/index');
-//Route::rule('admin', 'admin/Index/index');
-//Route::rule('adminlogin', 'admin/Login/index');
+Route::rule('index', 'index/Index/index');
+Route::rule('indexlogin', 'index/Login/index');
+Route::rule('admin', 'admin/Index/index');
+Route::rule('adminlogin', 'admin/Login/index');
 return [
 
 ];
